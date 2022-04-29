@@ -35,12 +35,17 @@ const App = () => {
     "Debugging is twice as hard as writing the code in the first place. Therefore, if you write the code as cleverly as possible, you are, by definition, not smart enough to debug it.",
     "Programming without an extremely heavy use of console.log is same as if a doctor would refuse to use x-rays or blood tests when dianosing patients.",
   ];
+
+  // use state
   const [selected, setSelected] = useState(0);
+
   // create array of points with starting value of 0 and last value of anecdotes.length
   const [points, setPoints] = useState(Array(anecdotes.length).fill(0));
+
   // set random value to useState
   const randomSelect = () =>
     setSelected(Math.floor(Math.random() * anecdotes.length));
+
   // add vote to selected anecdote
   const vote = () => {
     const votes = { ...points };
