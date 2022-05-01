@@ -30,12 +30,13 @@ const App = () => {
       number: newNumber,
     };
 
-    persons.map((person) => {
-      if (Object.values(person).indexOf(personObject.name) > -1) {
+    persons.filter((person) => {
+      if (person.name.toLowerCase() === personObject.name.toLowerCase()) {
         bool = false;
         return alert(`${personObject.name} is already added to phonebook`);
       }
     });
+
     if (bool) setPersons(persons.concat(personObject));
   };
 
