@@ -1,6 +1,6 @@
 import Person from "./Person";
 
-const Filter = ({ persons, newFilter }) => {
+const Numbers = ({ persons, newFilter }) => {
   const filter = persons
     .filter((person) => {
       if (newFilter === "") {
@@ -12,4 +12,4 @@ const Filter = ({ persons, newFilter }) => {
     .map((person) => <Person key={person.id} persons={person} />);
   return filter;
 };
-export default Filter;
+export default Numbers;
