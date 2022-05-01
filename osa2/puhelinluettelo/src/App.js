@@ -23,13 +23,14 @@ const App = () => {
 
   const addPerson = (event) => {
     event.preventDefault();
-    let bool = true;
+
     const personObject = {
       id: persons.length + 1,
       name: newName,
       number: newNumber,
     };
 
+    let bool = true;
     persons.filter((person) => {
       if (person.name.toLowerCase() === personObject.name.toLowerCase()) {
         bool = false;
