@@ -15,7 +15,6 @@ const PersonForm = ({
       <div>
         <button type="submit">add</button>
       </div>
-      {console.log("clicked")}
     </form>
   );
 };

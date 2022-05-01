@@ -5,8 +5,8 @@ import FilterForm from "./components/FilterForm";
 
 const App = () => {
   const [persons, setPersons] = useState([]);
-  const [newName, setNewName] = useState("arto");
-  const [newNumber, setNewNumber] = useState("5555");
+  const [newName, setNewName] = useState("");
+  const [newNumber, setNewNumber] = useState("");
   const [newFilter, setNewFilter] = useState("");
 
   const handlePersonChange = (event) => {
