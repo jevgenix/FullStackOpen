@@ -1,16 +1,27 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 
-const Countries = ({ country }) => {
-  return <li>{country.name.common}</li>;
+const Countries = ({ country, handleShowButton }) => {
+  return (
+    <li>
+      {country.name.common}
+      <button
+        onClick={handleShowButton}
+        value={country.name.common}
+        type="submit"
+      >
+        show
+      </button>
+    </li>
+  );
 };
 
 const Country = ({ country }) => {
   const languages = country.languages;
+  console.log(country);
   return (
     <div>
       <h1>{country.name.common}</h1>
-
       <p>capital {country.capital[0]} </p>
       <p> area {country.area} </p>
       <h3>languages: </h3>
@@ -24,7 +35,7 @@ const Country = ({ country }) => {
   );
 };
 
-const FilterCountries = ({ countries, searchData }) => {
+const FilterCountries = ({ countries, searchData, handleShowButton }) => {
   const filter = countries
     .filter((country) => {
       if (searchData === "") {
@@ -36,7 +47,13 @@ const FilterCountries = ({ countries, searchData }) => {
       }
     })
     .map((country, i) => {
-      return <Countries key={i} country={country} />;
+      return (
+        <Countries
+          key={i}
+          country={country}
+          handleShowButton={handleShowButton}
+        />
+      );
     });
 
   if (filter.length === 1) {
@@ -61,6 +78,17 @@ function App() {
     setSearchData(event.target.value);
   };
 
+  const handleShowButton = (event) => {
+    event.preventDefault();
+
+    Object.values(countries).map((country) => {
+      if (country.name.common === event.target.value) {
+        console.log(country.name.common);
+        return <Country country={country} />;
+      }
+    });
+  };
+
   return (
     <div>
       <form>
@@ -69,7 +97,11 @@ function App() {
           <input value={searchData} onChange={handleFormSearch} />
         </div>
       </form>
-      <FilterCountries countries={countries} searchData={searchData} />
+      <FilterCountries
+        countries={countries}
+        searchData={searchData}
+        handleShowButton={handleShowButton}
+      />
     </div>
   );
 }
