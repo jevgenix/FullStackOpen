@@ -16,21 +16,52 @@ const Countries = ({ country, handleShowButton }) => {
   );
 };
 
-const Country = ({ country }) => {
-  const languages = country.languages;
-  console.log(country);
+const WeatherData = ({ weatherData }) => {
+  const { name, main, wind, weather } = weatherData;
+  const icon = `https://openweathermap.org/img/wn/${weather[0].icon}@2x.png`;
   return (
     <div>
-      <h1>{country.name.common}</h1>
-      <p>capital {country.capital[0]} </p>
-      <p> area {country.area} </p>
+      <h1>Weather in {name}</h1>
+      <p>temperature {(main.temp - 273.15).toFixed(2)} Celcius</p>
+      <img alt="weather" src={icon} />
+      <p> wind {wind.speed} m/s</p>
+    </div>
+  );
+};
+
+const Country = ({ country }) => {
+  const { capital, name, languages, area, flags } = country;
+  const [weatherData, setWeatherData] = useState({});
+  const api_key = process.env.REACT_APP_WEATHER_API_KEY;
+
+  useEffect(() => {
+    axios
+      .get(
+        "https://api.openweathermap.org/data/2.5/weather?q=" +
+          capital +
+          "&APPID=" +
+          api_key
+      )
+      .then((response) => {
+        console.log(response.data);
+        setWeatherData(response.data);
+      });
+  }, [capital, api_key]);
+
+  console.log(weatherData);
+  return (
+    <div>
+      <h1>{name.common}</h1>
+      <p>capital {capital} </p>
+      <p> area {area} </p>
       <h3>languages: </h3>
       <ul>
         {Object.entries(languages).map((language) => {
           return <li key={language[0]}> {language[1]} </li>;
         })}
       </ul>
-      <img alt="flag" src={country.flags["png"]} />
+      <img alt="flag" src={flags["png"]} />
+      <WeatherData weatherData={weatherData} />
     </div>
   );
 };
@@ -57,7 +88,6 @@ const FilterCountries = ({ countries, searchData, handleShowButton }) => {
     });
 
   if (filter.length === 1) {
-    console.log(filter);
     return <Country country={filter[0].props.country} />;
   } else {
     return <ul>{filter}</ul>;
@@ -83,7 +113,6 @@ function App() {
 
     Object.values(countries).map((country) => {
       if (country.name.common === event.target.value) {
-        console.log(country.name.common);
         setSearchData(country.name.common);
       }
     });
