@@ -84,7 +84,7 @@ function App() {
     Object.values(countries).map((country) => {
       if (country.name.common === event.target.value) {
         console.log(country.name.common);
-        return <Country country={country} />;
+        setSearchData(country.name.common);
       }
     });
   };
@@ -97,6 +97,7 @@ function App() {
           <input value={searchData} onChange={handleFormSearch} />
         </div>
       </form>
+
       <FilterCountries
         countries={countries}
         searchData={searchData}
