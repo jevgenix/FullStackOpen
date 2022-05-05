@@ -71,6 +71,12 @@ const App = () => {
           setNewNumber("");
         }
       } else {
+        bool = true;
+      }
+    });
+
+    persons.map((person) => {
+      if (person.name.toLowerCase() === personObject.name.toLowerCase()) {
         bool = false;
       }
     });
