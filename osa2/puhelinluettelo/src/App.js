@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import PersonForm from "./components/PersonForm";
 import Numbers from "./components/Numbers";
 import FilterForm from "./components/FilterForm";
+import Notification from "./components/Notification";
+import NotificationError from "./components/NotificationError";
 import personService from "./services/persons";
 
 const App = () => {
@@ -9,13 +11,21 @@ const App = () => {
   const [newName, setNewName] = useState("");
   const [newNumber, setNewNumber] = useState("");
   const [newFilter, setNewFilter] = useState("");
-
-  const [detele, setDelete] = useState(false);
+  const [errorMessage, setErrorMessage] = useState(null);
+  const [message, setMessage] = useState(null);
 
   useEffect(() => {
-    personService.getAll().then((initialPersons) => {
-      setPersons(initialPersons);
-    });
+    personService
+      .getAll()
+      .then((initialPersons) => {
+        setPersons(initialPersons);
+      })
+      .catch((err) => {
+        setErrorMessage("error", err);
+        setTimeout(() => {
+          setErrorMessage(null);
+        }, 5000);
+      });
   }, []);
 
   const handlePersonChange = (event) => {
@@ -47,10 +57,6 @@ const App = () => {
             `${person.name} is already added to phonebook, replace the old number with a new one?`
           )
         ) {
-          // test
-          console.log(
-            `${person.name}'s ${person.number} is replaced with new ${personObject.number} number`
-          );
           const personData = persons.find((n) => n.name === newName);
           const changedPerson = { ...personData, number: newNumber };
 
@@ -62,13 +68,24 @@ const App = () => {
                   person.name === newName ? returnedPerson : person
                 )
               );
-            })
+            }, setMessage(`${person.name}'s ${person.number} replaced with new ${personObject.number} number`))
             .catch((error) => {
-              console.log(error);
+              setMessage(null);
+              setErrorMessage(
+                "Error accured on trying update person information",
+                error
+              );
+              setTimeout(() => {
+                setErrorMessage(null);
+              }, 5000);
             });
           bool = false;
+
           setNewName("");
           setNewNumber("");
+          setTimeout(() => {
+            setMessage(null);
+          }, 5000);
         }
       } else {
         bool = true;
@@ -86,12 +103,22 @@ const App = () => {
         .then((returnedObject) => {
           setPersons(persons.concat(returnedObject));
           console.log(`Person ${personObject.name} added`);
+          setMessage(
+            `${personObject.name} ${personObject.number} added to list`
+          );
           setNewName("");
           setNewNumber("");
         })
         .catch((error) => {
-          console.log(error);
+          setErrorMessage("Error occured while you tried to add new person!");
+          setPersons(persons.filter((n) => n.id !== personObject.id));
+          setTimeout(() => {
+            setErrorMessage(null);
+          }, 5000);
         });
+      setTimeout(() => {
+        setMessage(null);
+      }, 5000);
     }
   };
 
@@ -103,9 +130,19 @@ const App = () => {
           .remove(id)
           .then(() => {
             setPersons(persons.filter((n) => n.id !== id));
+            setMessage(`Person ${name} removed from list`);
+            setTimeout(() => {
+              setMessage(null);
+            }, 5000);
           })
           .catch((err) => {
-            console.log(err);
+            setErrorMessage(
+              `Information of ${name} has already been removed from server`
+            );
+            setPersons(persons.filter((n) => n.id !== id));
+            setTimeout(() => {
+              setErrorMessage(null);
+            }, 5000);
           });
       }
     };
@@ -114,6 +151,8 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification message={message} />
+      <NotificationError errorMessage={errorMessage} />
       <FilterForm onChange={handleFilterChange} />
       <h2>add a new</h2>
       <PersonForm
