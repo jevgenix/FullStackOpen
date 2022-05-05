@@ -1,6 +1,6 @@
 import Person from "./Person";
 
-const Numbers = ({ persons, newFilter }) => {
+const Numbers = ({ persons, newFilter, toggleToDelete }) => {
   const filter = persons
     .filter((person) => {
       if (newFilter === "") {
@@ -9,7 +9,13 @@ const Numbers = ({ persons, newFilter }) => {
         return person;
       }
     })
-    .map((person) => <Person key={person.id} persons={person} />);
+    .map((person) => (
+      <Person
+        key={person.id}
+        persons={person}
+        toggleToDelete={toggleToDelete(person.id, person.name)}
+      />
+    ));
   return filter;
 };
 export default Numbers;
