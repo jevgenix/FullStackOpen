@@ -1,6 +1,6 @@
 const express = require("express");
 const app = express();
-
+const morgan = require("morgan");
 app.use(express.json());
 
 let persons = [
@@ -25,6 +25,21 @@ let persons = [
     id: 4,
   },
 ];
+
+app.use(
+  morgan((tokens, req, res) => {
+    return [
+      tokens.method(req, res),
+      tokens.url(req, res),
+      tokens.status(req, res),
+      tokens.res(req, res, "content-length"),
+      "-",
+      tokens["response-time"](req, res),
+      "ms",
+      JSON.stringify(req.body),
+    ].join(" ");
+  })
+);
 
 app.get("/api/persons", (req, res) => {
   res.json(persons);
@@ -76,8 +91,8 @@ app.post("/api/persons", (req, res) => {
     id: generateID(),
   };
 
-  persons.map((person) => {
-    if (person.name === person.name) {
+  persons.map((p) => {
+    if (p.name === person.name) {
       return res.status(400).json({
         error: "name is already in use, name must be unique",
       });
@@ -85,9 +100,16 @@ app.post("/api/persons", (req, res) => {
   });
 
   persons = persons.concat(person);
-
   res.json(person);
 });
+
+const unknownEndpoint = (req, res) => {
+  res.status(404).send({
+    error: "unknown endpoint",
+  });
+};
+
+app.use(unknownEndpoint);
 
 const PORT = 3001;
 app.listen(PORT);
