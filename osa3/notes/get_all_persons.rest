@@ -1,0 +1,13 @@
+//DELETE http://localhost:3001/api/persons/5
+// Content-Type: application/json
+
+//GET http://localhost:3001/api/persons
+
+
+POST http://localhost:3001/api/persons
+Content-Type: application/json
+
+{
+    "name": "Pekka Pekkanen",
+    "number": "39-23-6423122"
+}
