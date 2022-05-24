@@ -1,6 +1,10 @@
 const express = require("express");
 const app = express();
 const morgan = require("morgan");
+const cors = require("cors");
+
+app.use(cors());
+
 app.use(express.json());
 
 let persons = [
@@ -111,6 +115,6 @@ const unknownEndpoint = (req, res) => {
 
 app.use(unknownEndpoint);
 
-const PORT = 3001;
+const PORT = process.env.PORT || 3001;
 app.listen(PORT);
 console.log(`listening on port ${PORT}`);
