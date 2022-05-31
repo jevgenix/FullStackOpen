@@ -1,14 +1,14 @@
 const express = require("express");
 const app = express();
-const morgan = require("morgan");
 const cors = require("cors");
-
-app.use(cors());
-app.use(express.static("build"));
-app.use(express.json());
+const morgan = require("morgan");
 
 // import person model
 const Person = require("./models/person");
+
+app.use(express.json());
+app.use(cors());
+app.use(express.static("build"));
 
 app.use(
   morgan((tokens, req, res) => {
@@ -33,7 +33,9 @@ app.get("/api/persons", (req, res) => {
 
 app.get("/info", (req, res) => {
   const date = new Date();
-  res.send(`<p>Phonebook as info for ${Person.length} people </p>` + date);
+  Person.find({}).then((result) => {
+    res.send(`<p>Phonebook as info for ${result.length} people </p>` + date);
+  });
 });
 
 app.get("/api/persons/:id", (req, res, next) => {
@@ -48,23 +50,28 @@ app.get("/api/persons/:id", (req, res, next) => {
     .catch((error) => next(error));
 });
 
-app.post("/api/persons", (req, res) => {
-  const body = req.body;
+app.post("/api/persons", (req, res, next) => {
+  const { name, number } = req.body;
 
-  if (!body.number || !body.name) {
-    return response.status(400).json({
+  if (!number || !name) {
+    return res.status(400).json({
       error: "name or number missing",
     });
   }
 
   const person = new Person({
-    name: body.name,
-    number: body.number,
+    name: name,
+    number: number,
   });
 
-  person.save().then((result) => {
-    res.json(result);
-  });
+  console.log(name, number);
+
+  person
+    .save()
+    .then((result) => {
+      res.json(result.toJSON());
+    })
+    .catch((error) => next(error));
 });
 
 // delete person
@@ -78,13 +85,13 @@ app.delete("/api/persons/:id", (req, res) => {
 
 // update person
 app.put("/api/persons/:id", (req, res, next) => {
-  const body = req.body;
-  const person = {
-    name: body.name,
-    number: body.number,
-  };
+  const { name, number } = req.body;
 
-  Person.findByIdAndUpdate(req.params.id, person, { new: true })
+  Person.findByIdAndUpdate(
+    req.params.id,
+    { name, number },
+    { new: true, runValidators: true, context: "query" }
+  )
     .then((result) => {
       res.json(result);
     })
@@ -103,7 +110,7 @@ const errorHandler = (err, req, res, next) => {
   if (err.name === "CastError") {
     return res.status(400).send({ error: "malformatted id" });
   } else if (err.name === "ValidationError") {
-    return res.status(400).send({ error: err.message });
+    return res.status(400).json({ error: err.message });
   }
   next(err);
 };
